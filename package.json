@@ -1,0 +1,25 @@
+{
+  "name": "Cacher",
+  "version": "0.0.1",
+  "description": "A memcached backed http cache in the form of express middleware",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/addisonj/Cacher.git"
+  },
+  "keywords": [
+    "memcached",
+    "cache",
+    "middleware",
+    "express",
+    "http-caching"
+  ],
+  "author": "Addison Higham <addisonj@gmail.com> (github.com/addisonj)",
+  "license": "BSD",
+  "dependencies": {
+    "memcached": "0.0.12"
+  }
+}
