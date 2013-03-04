@@ -31,6 +31,10 @@ cacher.on("hit", function(url) {
 cacher.on("miss", function(url) {
   console.log("doh!")
 })
+
+cacher.on("error", function(err) {
+  console.log(err)
+})
 ```
 
 
