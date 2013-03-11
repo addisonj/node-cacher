@@ -1,6 +1,6 @@
 {
   "name": "cacher",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A memcached backed http cache in the form of express middleware",
   "main": "index.js",
   "scripts": {
