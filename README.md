@@ -63,6 +63,7 @@ Currently, Cacher comes bundled with an in-memory cache
 
 Backends are distributed as seperated modules:
 - cacher-memcached (https://github.com/addisonj/cacher-memcached)
+- cacher-redis (https://github.com/addisonj/cacher-redis)
 
 
 ## Backend Client Api
