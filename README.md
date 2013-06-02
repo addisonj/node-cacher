@@ -2,42 +2,81 @@
 It does the hard work so you don't have too!
 
 ## What is it?
-A distibuted HTTP caching that utilzies memcached and is implented using an express middleware!
+HTTP Caching implemented as express middleware, with pluggable backends for support for a variety of caching servers (memcached, redis, etc)
 
 ## Features
-- Set expiriry times per-app or per-route. It sets headers and sets the ttl
+- Set expiriry times per-app or per-route. It sets proper headers for client caching
 - Avoids the thundering heard by smartly refreshing the cache
-- emits hit or miss events so you can track your hitrate
+- Emits hit or miss events so you can track your hitrate
+- Simple invadlidations
+- Overrides for custom cache keys and dev mode support
+- Obeys (some) client Cache-Control headers
 
 ## What does it look like?
 ``` JavaScript
 var Cacher = require("cacher")
-var cacher = new Cacher("myhost:11211")
-// or
-var cacher = new Cacher({hosts: ["host1:11211", "host2:11211"], memcached_opts: {poolSize: 25})
+// use the default in memory cache
+var cacher = new Cacher()
+// or pass in a different cache client (in this cached memcached) for different backend support
+CacherMemcached = require('cacher-memcached')
+var cacher = new Cacher(new CacherMemcached('host1:12345'))
 
 // as a global middleware
-app.use(cacher.cacheHourly())
+app.use(cacher.cache('seconds', 30))
 // or per route
-app.get("/long-cache", cacher.cacheDaily(), ...)
-app.get("/short-cache", cacher.cacheOneMinute(), ...)
-app.get("/no-cache", ...)
+app.get("/long-cache", cacher.cache('days'), ...)
+app.get("/short-cache", cacher.cache('minute'), ...)
+// will set no-cache headers for routes that we explicitly want to ignore caching on
+app.get("/no-cache", cacher.cache(false), ...)
 
-// listen for events
-cacher.on("hit", function(url) {
+// Backwards compatible with old cache definitions
+app.use(cacher.cacheHourly())
+app.get("/long-cache", cacher.cacheDays(2), ...)
+
+// invalidation support
+cacher.invalidate('/home')
+
+// listen for events to track cache rate and errors
+cacher.on("hit", function(key) {
   console.log("woohoo!")
 })
-
-cacher.on("miss", function(url) {
+cacher.on("miss", function(key) {
   console.log("doh!")
 })
-
-cacher.on("error", function(err) {
+cacher.on("error", function(key) {
   console.log(err)
 })
+
+// Dev mode, quickly turn off caching when it gets in the way
+app.configure('development', function() {
+  cacher.noCaching = true
+})
+
+// override cache key generation for finer grain control
+cacher.genCacheKey = function(req) {
+  return req.path + req.header('user-agent')
+}
 ```
 
+## Backends
+Currently, Cacher comes bundled with an in-memory cache
 
-## TODO
-Uses 3rd-Eden/node-memcached as a memcached client, but atm its connection pooling is broken...
+Backends are distributed as seperated modules:
+- cacher-memcached (github.com/addisonj/cacher-memcached)
 
+
+## Backend Client Api
+If you want to implement your own backend, the API is really simple:
+
+```JavaScript
+// pass whatever options are needed for connection
+function MyBackend(...) {
+}
+
+// cb is required, cb(err, cacheObject)
+MyBackend.prototype.get = function(key, cb) {}
+
+MyBackend.prototype.set = function(key, cacheObject, ttlInSeconds, [cb]) {}
+
+MyBackend.prototype.invaldaite = function(key, [cb]) {}
+```
