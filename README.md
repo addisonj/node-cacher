@@ -69,7 +69,8 @@ Backends are distributed as seperated modules:
 If you want to implement your own backend, the API is really simple:
 
 ```JavaScript
-// pass whatever options are needed for connection
+// pass whatever options are needed for connection/options
+// provide defaults so a client can be fully instantiated with no parameters
 function MyBackend(...) {
 }
 
@@ -79,4 +80,12 @@ MyBackend.prototype.get = function(key, cb) {}
 MyBackend.prototype.set = function(key, cacheObject, ttlInSeconds, [cb]) {}
 
 MyBackend.prototype.invaldaite = function(key, [cb]) {}
+```
+
+## Testing your backend
+Run unit tests using your backend by doing the following:
+```Shell
+cd Cacher
+npm link ../myBackend
+CACHER_CLIENT=myBackend npm test
 ```

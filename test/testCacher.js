@@ -5,12 +5,20 @@ var express = require('express')
 var supertest = require('supertest')
 var async = require('async')
 var assert = require('assert')
+var Client = null
+var clientConfig = null
+
+if (process.env.CACHER_CLIENT) {
+  Client = require(process.env.CACHER_CLIENT)
+} else {
+  Client = MemoryCache
+}
 
 describe('Cacher', function() {
   describe('Instantation', function() {
-    it('should instantiate with no parameters and have a MemoryCache client', function() {
-      var c = new Cacher()
-      assert(c.client instanceof MemoryCache)
+    it('should instantiate with no parameters and have a proper client', function() {
+      var c = new Cacher(new Client())
+      assert(c.client instanceof Client)
     })
 
     it('should not instantiate when passed a client that doesnt adhere to the interface', function() {
@@ -25,7 +33,7 @@ describe('Cacher', function() {
   })
 
   describe('CalcTtl', function() {
-    var c = new Cacher()
+    var c = new Cacher(new Client())
 
     it('should be able to compute proper ttls from cache values', function() {
       var MIN = 60
@@ -47,7 +55,7 @@ describe('Cacher', function() {
   })
 
   describe('Override Caching', function() {
-    var cacher = new Cacher()
+    var cacher = new Cacher(new Client())
     cacher.noCaching = true
 
     var app = express()
@@ -79,7 +87,7 @@ describe('Cacher', function() {
   })
 
   describe('Caching', function() {
-    var cacher = new Cacher()
+    var cacher = new Cacher(new Client())
 
     var app = express()
     app.get('/long', cacher.cache('day'), function(req, res) {
