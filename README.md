@@ -62,7 +62,7 @@ cacher.genCacheKey = function(req) {
 Currently, Cacher comes bundled with an in-memory cache
 
 Backends are distributed as seperated modules:
-- cacher-memcached (github.com/addisonj/cacher-memcached)
+- cacher-memcached (https://github.com/addisonj/cacher-memcached)
 
 
 ## Backend Client Api
