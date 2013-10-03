@@ -36,6 +36,9 @@ app.get("/long-cache", cacher.cacheDays(2), ...)
 // invalidation support
 cacher.invalidate('/home')
 
+// don't cache xhr requests
+cacher.xhr = false
+
 // if you don't want browser caching
 cacher.browserCache = false
 
