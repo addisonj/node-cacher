@@ -36,8 +36,8 @@ app.get("/long-cache", cacher.cacheDays(2), ...)
 // invalidation support
 cacher.invalidate('/home')
 
-// if you don't want to cache xhr requests set it to false.
-cacher.xhr = false
+// if you don't want browser caching
+cacher.browserCache = false
 
 // listen for events to track cache rate and errors
 cacher.on("hit", function(key) {
@@ -56,7 +56,6 @@ app.configure('development', function() {
 })
 
 // override cache key generation for finer grain control
-// if you don't return a `true` value, no caching will be applied
 cacher.genCacheKey = function(req) {
   return req.path + req.header('user-agent')
 }
