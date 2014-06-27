@@ -339,5 +339,25 @@ describe('Cacher', function() {
             })
         })
     })
+    it('should be able to dynamically disable caching', function(done) {
+      cacher.noCaching = true
+      supertest(app)
+        .get('/long')
+        .expect('Cache-Control', 'no-cache')
+        .expect(200)
+        .end(function(err, res) {
+          assert.ifError(err)
+          cacher.noCaching = false
+
+          supertest(app)
+            .get('/long')
+            .expect(cacher.cacheHeader, 'true')
+            .expect(200)
+            .end(function(err, res) {
+              assert.ifError(err)
+              done()
+            })
+        })
+    })
   })
 })
