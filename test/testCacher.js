@@ -88,32 +88,8 @@ describe('Cacher', function() {
 
   describe('Caching', function() {
     var cacher = new Cacher(new Client())
+    var app = require("./fixtures/server")(cacher)
 
-    var app = express()
-    app.get('/long', cacher.cache('day'), function(req, res) {
-      res.send('long')
-    })
-    app.get('/short', cacher.cache('second'), function(req, res) {
-      res.send('short')
-    })
-    app.get('/json', cacher.cache('day'), function(req, res) {
-      res.json({boop: true})
-    })
-    app.get('/201', cacher.cache('day'), function(req, res) {
-      res.send("boop", 201)
-    })
-    app.get('/header', cacher.cache('day'), function(req, res) {
-      res.set('X-Custom-Header', 'boop')
-      res.send('header')
-    })
-    app.post('/post',  function(req, res) {
-      res.send('OK')
-    })
-    app.get('/write', cacher.cache('day'), function(req, res) {
-      res.type('text')
-      res.write('beep|')
-      res.end('boop')
-    })
     it('should cache when there is a sufficent ttl', function(done) {
       supertest(app)
         .get('/long')
@@ -311,6 +287,54 @@ describe('Cacher', function() {
             .expect('Content-Type', /text/)
             .end(function(err, res) {
               assert.ifError(err)
+              done()
+            })
+        })
+    })
+    it('should work with attachments', function(done) {
+      supertest(app)
+        .get('/pdf')
+        .expect(cacher.cacheHeader, 'false')
+        .expect(200)
+        .expect('Content-Type', /pdf/)
+        .expect('Content-Length', '7945')
+        .end(function(err, res) {
+          assert.ifError(err)
+          var text = res.text
+
+          supertest(app)
+            .get('/pdf')
+            .expect(cacher.cacheHeader, 'true')
+            .expect(200)
+            .expect('Content-Type', /pdf/)
+            .expect('Content-Length', '7945')
+            .end(function(err, res) {
+              assert.ifError(err)
+              assert.equal(text, res.text)
+              done()
+            })
+        })
+    })
+    it('should work with files', function(done) {
+      supertest(app)
+        .get('/image')
+        .expect(cacher.cacheHeader, 'false')
+        .expect(200)
+        .expect('Content-Type', /png/)
+        .expect('Content-Length', '1504')
+        .end(function(err, res) {
+          assert.ifError(err)
+          var text = res.text
+
+          supertest(app)
+            .get('/image')
+            .expect(cacher.cacheHeader, 'true')
+            .expect(200)
+            .expect('Content-Type', /png/)
+            .expect('Content-Length', '1504')
+            .end(function(err, res) {
+              assert.ifError(err)
+              assert.equal(text, res.text)
               done()
             })
         })
