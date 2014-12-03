@@ -162,7 +162,8 @@ describe('Cacher', function() {
       })
     })
 
-    it('shouldnt cache when sending a no cache header', function(done) {
+    it('should be able to dynamically disable ignoring of request headers', function(done) {
+      cacher.ignoreClientNoCache = false
       supertest(app)
         .get('/long')
         .set('Cache-Control', 'no-cache')
@@ -171,6 +172,7 @@ describe('Cacher', function() {
         .expect('long')
         .expect('Content-Type', /text/)
         .end(function(err, res) {
+          cacher.ignoreClientNoCache = true
           assert.ifError(err)
           done()
         })
@@ -359,8 +361,7 @@ describe('Cacher', function() {
             })
         })
     })
-    it('should be able to ignore request cache control headers', function(done) {
-      cacher.ignoreClientNoCache = true
+    it('should ignore request cache control headers by default', function(done) {
       supertest(app)
         .get('/long')
         .expect(200)
@@ -373,7 +374,6 @@ describe('Cacher', function() {
             .expect(cacher.cacheHeader, 'true')
             .expect(200)
             .end(function(err, res) {
-              cacher.ignoreClientNoCache = false
               assert.ifError(err)
               done()
             })
