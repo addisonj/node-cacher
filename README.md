@@ -80,7 +80,7 @@ MyBackend.prototype.get = function(key, cb) {}
 
 MyBackend.prototype.set = function(key, cacheObject, ttlInSeconds, [cb]) {}
 
-MyBackend.prototype.invaldaite = function(key, [cb]) {}
+MyBackend.prototype.invalidate = function(key, [cb]) {}
 ```
 
 ## Testing your backend
