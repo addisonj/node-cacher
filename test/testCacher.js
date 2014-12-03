@@ -359,5 +359,25 @@ describe('Cacher', function() {
             })
         })
     })
+    it('should be able to ignore request cache control headers', function(done) {
+      cacher.ignoreClientNoCache = true
+      supertest(app)
+        .get('/long')
+        .expect(200)
+        .end(function(err, res) {
+          assert.ifError(err)
+
+          supertest(app)
+            .get('/long')
+            .set('Cache-Control', 'no-cache')
+            .expect(cacher.cacheHeader, 'true')
+            .expect(200)
+            .end(function(err, res) {
+              cacher.ignoreClientNoCache = false
+              assert.ifError(err)
+              done()
+            })
+        })
+    })
   })
 })
