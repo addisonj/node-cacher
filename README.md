@@ -5,10 +5,10 @@ It does the hard work so you don't have too!
 HTTP Caching implemented as express middleware, with pluggable backends for support for a variety of caching servers (memcached, redis, etc)
 
 ## Features
-- Set expiriry times per-app or per-route. It sets proper headers for client caching
+- Set expiry times per-app or per-route. It sets proper headers for client caching
 - Avoids the thundering heard by smartly refreshing the cache
 - Emits hit or miss events so you can track your hitrate
-- Simple invadlidations
+- Simple invalidations
 - Overrides for custom cache keys and dev mode support
 - Obeys (some) client Cache-Control headers
 
@@ -43,7 +43,7 @@ cacher.on("hit", function(key) {
 cacher.on("miss", function(key) {
   console.log("doh!")
 })
-cacher.on("error", function(key) {
+cacher.on("error", function(err) {
   console.log(err)
 })
 
@@ -61,7 +61,7 @@ cacher.genCacheKey = function(req) {
 ## Backends
 Currently, Cacher comes bundled with an in-memory cache
 
-Backends are distributed as seperated modules:
+Backends are distributed as separate modules:
 - cacher-memcached (https://github.com/addisonj/cacher-memcached)
 - cacher-redis (https://github.com/addisonj/cacher-redis)
 
