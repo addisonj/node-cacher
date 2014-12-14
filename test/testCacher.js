@@ -379,5 +379,34 @@ describe('Cacher', function() {
             })
         })
     })
+
+    it('should avoid key collisions when same relative url is used on two different mount points', function(done) {
+
+      var collisionTest = function(expectedCache, next) {
+        supertest(app)
+          .get('/fooMount/nodupe')
+          .expect(cacher.cacheHeader, expectedCache)
+          .expect(200, 'foo')
+          .end(function(err, res) {
+            assert.ifError(err);
+
+            supertest(app)
+              .get('/barMount/nodupe')
+              .expect(cacher.cacheHeader, expectedCache)
+              .expect(200, 'bar')
+              .end(function(err, res) {
+                assert.ifError(err);
+                next();
+              });
+          });
+      };
+
+      async.series([
+        function(next) { collisionTest('false', next) },
+        function(next) { collisionTest('true', next) },
+        function() { done(); }
+      ]);
+    });
+
   })
 })

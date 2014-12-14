@@ -33,6 +33,18 @@ module.exports = function(cacher) {
   app.get('/image', cacher.cache('day'), function(req, res) {
     res.sendfile(path.join(__dirname, 'test.png'))
   })
+
+  var fooRouter = express.Router();
+  var barRouter = express.Router();
+  app.use('/fooMount', fooRouter);
+  app.use('/barMount', barRouter);
+  fooRouter.get('/nodupe', cacher.cache('second', 10), function(req, res) {
+    res.send('foo');
+  });
+  barRouter.get('/nodupe', cacher.cache('second', 10), function(req, res) {
+    res.send('bar');
+  });
+
   return app
 }
 
