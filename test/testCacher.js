@@ -224,6 +224,32 @@ describe('Cacher', function() {
             })
         })
     })
+    it('shouldnt cache error responses', function(done) {
+      async.each(
+        [ 400, 401, 403, 404, 500, 504 ], function(httpErrorStatusCode, next) {
+          supertest(app)
+            .get('/error')
+            .query({ code: httpErrorStatusCode })
+            .expect(cacher.cacheHeader, 'false')
+            .expect(httpErrorStatusCode, 'kaboom')
+            .expect('Content-Type', /text/)
+            .end(function(err, res) {
+              assert.ifError(err);
+
+              supertest(app)
+                .get('/error')
+                .query({ code: httpErrorStatusCode })
+                .expect(cacher.cacheHeader, 'false')
+                .expect(httpErrorStatusCode, 'kaboom')
+                .expect('Content-Type', /text/)
+                .end(function(err, res) {
+                  assert.ifError(err);
+                  next();
+                });
+            });
+        }, done
+      );
+    });
     it('should preserve custom headers', function(done) {
      supertest(app)
         .get('/header')

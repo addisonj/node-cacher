@@ -45,6 +45,11 @@ module.exports = function(cacher) {
     res.send('bar');
   });
 
+  app.get('/error', cacher.cache('minute'), function(req, res) {
+    var code = Number(req.param('code')) || 400;
+    res.send('kaboom', code);
+  });
+
   return app
 }
 
