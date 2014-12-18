@@ -58,6 +58,14 @@ app.configure('development', function() {
 cacher.genCacheKey = function(req) {
   return req.path + req.header('user-agent')
 }
+
+// override cache TTL based on response
+cacher.genCacheTtl = function(res, origTtl) {
+  if (res.statusCode >= 400) {
+    return 0
+  }
+  return origTtl
+}
 ```
 
 ## Backends
