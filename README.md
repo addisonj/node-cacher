@@ -1,6 +1,8 @@
 ## Cacher
 It does the hard work so you don't have to!
 
+![Travis](https://travis-ci.org/addisonj/node-cacher.svg)
+
 ## What is it?
 HTTP Caching implemented as express middleware, with pluggable backends for support for a variety of caching servers (memcached, redis, etc)
 
