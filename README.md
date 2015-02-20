@@ -50,9 +50,10 @@ cacher.on("error", function(err) {
 })
 
 // Dev mode, quickly turn off caching when it gets in the way
-app.configure('development', function() {
+var env = process.env.NODE_ENV || 'development';
+if (env === 'development') {
   cacher.noCaching = true
-})
+}
 
 // override cache key generation for finer grain control
 cacher.genCacheKey = function(req) {
