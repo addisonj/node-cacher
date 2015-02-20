@@ -87,28 +87,28 @@ describe('Cacher', function() {
   })
 
   describe('Override TTL based on response', function() {
-    var cacher = new Cacher(new Client());
-    var app = express();
-    var errorCodes = [ 400, 401, 403, 404, 500, 504 ];
+    var cacher = new Cacher(new Client())
+    var app = express()
+    var errorCodes = [ 400, 401, 403, 404, 500, 504 ]
 
     app.get('/error', cacher.cache('minute'), function(req, res) {
-      var code = Number(req.param('code')) || 400;
-      res.send('kaboom', code);
-    });
+      var code = Number(req.param('code')) || 400
+      res.send('kaboom', code)
+    })
 
     beforeEach(function() {
       // clear '/error?code=*' entries from cache before each test.
       errorCodes.forEach(function(httpErrorStatusCode) {
-        cacher.invalidate('/error?code=' + httpErrorStatusCode);
-      });
-    });
+        cacher.invalidate('/error?code=' + httpErrorStatusCode)
+      })
+    })
 
     it('should return unaltered TTL by default, regardless of response statusCode', function(done) {
-      assert.strictEqual(cacher.genCacheTtl({ statusCode: 200 }, 60), 60);
+      assert.strictEqual(cacher.genCacheTtl({ statusCode: 200 }, 60), 60)
 
       async.each(
         errorCodes, function(httpErrorStatusCode, next) {
-          assert.strictEqual(cacher.genCacheTtl({ statusCode: httpErrorStatusCode }, 60), 60);
+          assert.strictEqual(cacher.genCacheTtl({ statusCode: httpErrorStatusCode }, 60), 60)
 
           supertest(app)
             .get('/error')
@@ -117,7 +117,7 @@ describe('Cacher', function() {
             .expect(httpErrorStatusCode, 'kaboom')
             .expect('Content-Type', /text/)
             .end(function(err, res) {
-              assert.ifError(err);
+              assert.ifError(err)
 
               supertest(app)
                 .get('/error')
@@ -126,28 +126,28 @@ describe('Cacher', function() {
                 .expect(httpErrorStatusCode, 'kaboom')
                 .expect('Content-Type', /text/)
                 .end(function(err, res) {
-                  assert.ifError(err);
-                  next();
-                });
-            });
+                  assert.ifError(err)
+                  next()
+                })
+            })
         }, done
-      );
-    });
+      )
+    })
 
     it('should use custom TTL on error responses when genCacheTtl is overridden', function(done) {
       // Override TTL for error responses to be 0 (i.e. not cached).
       cacher.genCacheTtl = function(res, origTtl) {
         if (errorCodes.indexOf(res.statusCode) >= 0) {
-          return 0;
+          return 0
         }
-        return origTtl;
-      };
+        return origTtl
+      }
 
-      assert.strictEqual(cacher.genCacheTtl({ statusCode: 200 }, 60), 60);
+      assert.strictEqual(cacher.genCacheTtl({ statusCode: 200 }, 60), 60)
 
       async.each(
         errorCodes, function(httpErrorStatusCode, next) {
-          assert.strictEqual(cacher.genCacheTtl({ statusCode: httpErrorStatusCode }, 60), 0);
+          assert.strictEqual(cacher.genCacheTtl({ statusCode: httpErrorStatusCode }, 60), 0)
 
           supertest(app)
             .get('/error')
@@ -156,7 +156,7 @@ describe('Cacher', function() {
             .expect(httpErrorStatusCode, 'kaboom')
             .expect('Content-Type', /text/)
             .end(function(err, res) {
-              assert.ifError(err);
+              assert.ifError(err)
 
               supertest(app)
                 .get('/error')
@@ -165,14 +165,14 @@ describe('Cacher', function() {
                 .expect(httpErrorStatusCode, 'kaboom')
                 .expect('Content-Type', /text/)
                 .end(function(err, res) {
-                  assert.ifError(err);
-                  next();
-                });
-            });
+                  assert.ifError(err)
+                  next()
+                })
+            })
         }, done
-      );
-    });
-  });
+      )
+    })
+  })
 
   describe('Caching', function() {
     var cacher = new Cacher(new Client())
@@ -476,25 +476,25 @@ describe('Cacher', function() {
           .expect(cacher.cacheHeader, expectedCache)
           .expect(200, 'foo')
           .end(function(err, res) {
-            assert.ifError(err);
+            assert.ifError(err)
 
             supertest(app)
               .get('/barMount/nodupe')
               .expect(cacher.cacheHeader, expectedCache)
               .expect(200, 'bar')
               .end(function(err, res) {
-                assert.ifError(err);
-                next();
-              });
-          });
-      };
+                assert.ifError(err)
+                next()
+              })
+          })
+      }
 
       async.series([
         function(next) { collisionTest('false', next) },
         function(next) { collisionTest('true', next) },
-        function() { done(); }
-      ]);
-    });
+        function() { done() }
+      ])
+    })
 
   })
 })

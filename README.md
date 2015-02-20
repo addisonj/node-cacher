@@ -50,7 +50,7 @@ cacher.on("error", function(err) {
 })
 
 // Dev mode, quickly turn off caching when it gets in the way
-var env = process.env.NODE_ENV || 'development';
+var env = process.env.NODE_ENV || 'development'
 if (env === 'development') {
   cacher.noCaching = true
 }
