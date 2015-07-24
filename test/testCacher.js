@@ -359,6 +359,35 @@ describe('Cacher', function() {
         })
     })
 
+    it('shouldnt cache an empty page with HEAD requests', function(done) {
+      supertest(app)
+        .head('/head')
+        .expect(200)
+        .expect('Content-Type', /text/)
+        .end(function(err, res) {
+          assert(!res.header[cacher.cacheHeader])
+          assert.ifError(err)
+          supertest(app)
+            .get('/head')
+            .expect(cacher.cacheHeader, 'false')
+            .expect('HEAD request')
+            .expect(200)
+            .expect('Content-Type', /text/)
+            .end(function(err, res) {
+              assert.ifError(err)
+              supertest(app)
+                .get('/head')
+                .expect(cacher.cacheHeader, 'true')
+                .expect('HEAD request')
+                .expect(200)
+                .expect('Content-Type', /text/)
+                .end(function(err, res) {
+                  done()
+                })
+            })
+        })
+    })
+
     it('should still work when res.write is used', function(done) {
       supertest(app)
         .get('/write')
