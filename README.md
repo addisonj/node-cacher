@@ -38,6 +38,12 @@ app.get("/long-cache", cacher.cacheDays(2), ...)
 // invalidation support
 cacher.invalidate('/home')
 
+// don't cache xhr requests
+cacher.xhr = false
+
+// if you don't want browser caching
+cacher.browserCache = false
+
 // listen for events to track cache rate and errors
 cacher.on("hit", function(key) {
   console.log("woohoo!")
