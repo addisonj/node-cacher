@@ -525,5 +525,37 @@ describe('Cacher', function() {
       ])
     })
 
+    /**
+     * useful when you got some response error and dont want to cache it
+     * Example;
+     * app.get('/dont-cache-onthefly', cacher.cache('day'), function(req, res) {
+     *   req.noCaching = true;
+     *   res.send('this is not cached')
+     * })
+     */
+    it('should let you avoid cache on the fly', function(done) {
+      supertest(app)
+        .get('/dont-cache-onthefly')
+        .expect(cacher.cacheHeader, 'false')
+        .expect(200)
+        .expect('this is not cached')
+        .expect('Content-Type', /text/)
+        .end(function(err, res) {
+          assert.ifError(err)
+
+          supertest(app)
+            .get('/dont-cache-onthefly')
+            .expect(cacher.cacheHeader, 'false')
+            .expect(200)
+            .expect('this is not cached')
+            .expect('Content-Type', /text/)
+            .end(function(err, res) {
+              assert.ifError(err)
+              done()
+            })
+        })
+    })
+
+
   })
 })
