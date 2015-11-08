@@ -36,6 +36,11 @@ module.exports = function(cacher) {
   app.get('/head', cacher.cache('day'), function(req, res) {
     res.send('HEAD request')
   })
+  app.get('/dont-cache-onthefly', cacher.cache('day'), function(req, res) {
+    req.noCaching = true;
+    res.send('this is not cached')
+  })
+
 
   var fooRouter = express.Router();
   var barRouter = express.Router();
